@@ -7,12 +7,12 @@
 //    (Consola Firebase → Configuración del proyecto → Tus apps → Web).
 //    Si lo dejas vacío, la app funciona en MODO DEMO (datos solo en este celular).
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyAd8j137Dtn7f6lS2HPU6Zv9-_Lrrg7O_M",
+  authDomain: "control-equipos-almacen.firebaseapp.com",
+  projectId: "control-equipos-almacen",
+  storageBucket: "control-equipos-almacen.firebasestorage.app",
+  messagingSenderId: "115103712411",
+  appId: "1:115103712411:web:a3a99bb4621fa125ecb23e"
 };
 
 // 2) Ajustes generales
