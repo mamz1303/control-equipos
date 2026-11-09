@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Solo usuarios de la app (sesión anónima de Firebase)
+    function app() { return request.auth != null; }
+
+    match /equipos/{codigo} {
+      allow read: if app();
+      allow write: if app() && request.resource.data.estado in ['en_uso', 'disponible'];
+    }
+    match /movimientos/{id} {
+      allow read: if app();
+      allow create: if app() && request.resource.data.tipo in ['retiro', 'devolucion'];
+      allow update, delete: if false;   // el historial no se puede alterar desde la app
+    }
+    match /fotos/{id} {
+      allow read: if app();
+      allow create: if app() && request.resource.data.data is string
+                    && request.resource.data.data.size() < 400000;  // ~300 KB máx.
+      allow update, delete: if false;
+    }
+    match /usuarios/{uid} {
+      allow read, write: if app() && request.auth.uid == uid;
+    }
+  }
+}
