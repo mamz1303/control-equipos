@@ -47,9 +47,17 @@ Si usas otro nombre de repositorio, las etiquetas QR deben regenerarse con la nu
 - **Retirar:** toca PDA, Radio o ambos → se propone su equipo asignado si está libre (o escanea el QR) → foto → Registrar.
 - **Devolver:** si la persona tiene equipos, el inicio muestra **Devolver equipo** con todo autocompletado; solo falta la foto.
 - **Panel:** estado en vivo de los 34 equipos, buscar por código o nombre (asignado o quien lo tiene), filtros PDA/Radio y Disponible/En uso. Rojo = más de 14 h fuera (`alertaHorasEnUso`).
-- **Historial:** todos los movimientos con foto; **Exportar CSV** abre en Excel.
+- **Historial (público):** solo los movimientos de HOY, en vivo, con foto.
+- **/panel (con código):** `https://mamz1303.github.io/control-equipos/panel/` → consulta por Día, Mes o Rango,
+  vista Lista o Fotos, descarga de fotos y **Exportar CSV** del periodo. La sesión dura 8 h en ese celular.
+  El código se cambia en `js/admin.js` (`HASH_CODIGO` = SHA-256 del código).
 - Si alguien retira un equipo que figura con otra persona, la app avisa y deja constancia en el historial.
 - Sin señal: el registro se guarda en el celular y se envía solo al recuperar conexión.
+
+## Modo pruebas / paso a producción
+- En la consola: Firestore → **Iniciar colección** `config` → ID de documento `app` → campo `modoPruebas` (boolean) = `true`.
+  Con eso aparece **Borrar datos** en /panel.
+- Para producción: cambia `modoPruebas` a `false` (el botón desaparece y las reglas bloquean el borrado).
 
 ## Capacidad (plan gratuito Spark)
 Firestore da 1 GB. Con 2 fotos por persona y turno (~26 personas) se usan ~5 MB/día → ~6 meses.

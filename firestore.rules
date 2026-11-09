@@ -4,20 +4,33 @@ service cloud.firestore {
     // Solo usuarios de la app (sesión anónima de Firebase)
     function app() { return request.auth != null; }
 
+    // "Borrar datos" del /panel solo funciona si en la consola existe
+    // config/app con el campo modoPruebas = true. Para producción: ponlo en false.
+    function pruebas() {
+      return get(/databases/$(database)/documents/config/app).data.modoPruebas == true;
+    }
+
+    match /config/{id} {
+      allow read: if app();
+      allow write: if false;            // solo se edita desde la consola de Firebase
+    }
     match /equipos/{codigo} {
       allow read: if app();
-      allow write: if app() && request.resource.data.estado in ['en_uso', 'disponible'];
+      allow create, update: if app() && request.resource.data.estado in ['en_uso', 'disponible'];
+      allow delete: if app() && pruebas();
     }
     match /movimientos/{id} {
       allow read: if app();
       allow create: if app() && request.resource.data.tipo in ['retiro', 'devolucion'];
-      allow update, delete: if false;   // el historial no se puede alterar desde la app
+      allow update: if false;           // el historial no se puede alterar
+      allow delete: if app() && pruebas();
     }
     match /fotos/{id} {
       allow read: if app();
       allow create: if app() && request.resource.data.data is string
                     && request.resource.data.data.size() < 400000;  // ~300 KB máx.
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if app() && pruebas();
     }
     match /usuarios/{uid} {
       allow read, write: if app() && request.auth.uid == uid;

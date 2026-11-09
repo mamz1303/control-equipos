@@ -18,7 +18,7 @@ async function backendFirebase() {
   const {
     initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
     collection, doc, onSnapshot, query, orderBy, limit, writeBatch,
-    serverTimestamp, getDoc, setDoc
+    serverTimestamp, getDoc, setDoc, getDocs, where
   } = fs;
 
   const app = initializeApp(firebaseConfig);
@@ -54,6 +54,35 @@ async function backendFirebase() {
       return onSnapshot(q, (snap) => {
         cb(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
       }, (e) => console.error(e));
+    },
+    // movimientos desde una fecha (en vivo) — usado por "Historial de hoy"
+    onMovimientosDesde(desde, cb) {
+      const q = query(collection(db, "movimientos"), where("ts", ">=", desde), orderBy("ts", "desc"), limit(1000));
+      return onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))), (e) => console.error(e));
+    },
+    // consulta por rango [desde, hasta) — usado por /panel
+    async consultar(desde, hasta) {
+      const q = query(collection(db, "movimientos"), where("ts", ">=", desde), where("ts", "<", hasta), orderBy("ts", "desc"));
+      const snap = await getDocs(q);
+      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    },
+    // config/app (se crea a mano en la consola). { modoPruebas: true } habilita "Borrar datos"
+    async config() {
+      try { const s = await getDoc(doc(db, "config", "app")); return s.exists() ? s.data() : {}; } catch { return {}; }
+    },
+    async borrarTodo(progreso = () => {}) {
+      const movsSnap = await getDocs(collection(db, "movimientos"));
+      const eqSnap = await getDocs(collection(db, "equipos"));
+      const refs = [];
+      movsSnap.forEach((d) => { refs.push(d.ref); const f = d.data().fotoId; if (f) refs.push(doc(db, "fotos", f)); });
+      eqSnap.forEach((d) => refs.push(d.ref));
+      for (let i = 0; i < refs.length; i += 400) {
+        const b = writeBatch(db);
+        refs.slice(i, i + 400).forEach((r) => b.delete(r));
+        await b.commit();
+        progreso(Math.min(refs.length, i + 400), refs.length);
+      }
+      return refs.length;
     },
     async guardarUsuario(nombre) {
       await setDoc(doc(db, "usuarios", uid), { nombre, ts: Date.now(), fecha: serverTimestamp() }, { merge: true });
@@ -118,6 +147,17 @@ function backendDemo() {
       const s = { n, cb }; subsMov.add(s);
       setTimeout(() => cb(leer(K.mov, []).slice(0, n)));
       return () => subsMov.delete(s);
+    },
+    onMovimientosDesde(desde, cb) {
+      const s = { n: 1e9, cb: (l) => cb(l.filter((m) => m.ts >= desde)) }; subsMov.add(s);
+      setTimeout(() => s.cb(leer(K.mov, [])));
+      return () => subsMov.delete(s);
+    },
+    async consultar(desde, hasta) { return leer(K.mov, []).filter((m) => m.ts >= desde && m.ts < hasta); },
+    async config() { return { modoPruebas: true }; },
+    async borrarTodo() {
+      const n = leer(K.mov, []).length;
+      [K.eq, K.mov, K.fot].forEach((k) => localStorage.removeItem(k)); emitir(); return n;
     },
     async guardarUsuario() {},
     async getFoto(id) { return leer(K.fot, {})[id] || null; },

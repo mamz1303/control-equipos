@@ -59,7 +59,7 @@ let backend;
 let usuario = LS.get("ce_usuario");     // { nombre }
 let estados = {};                        // codigo -> doc de estado
 let listo = false;
-let movs = [], movLimite = AJUSTES.historialPorPagina, offMovs = null;
+let movs = [], offMovs = null;
 let form = null;
 let pendienteEq = new URLSearchParams(location.search).get("eq");
 let filtroTipo = "", filtroEst = "";
@@ -379,18 +379,23 @@ async function detalleEquipo(c) {
       <div><span>Asignado a</span><b>${esc(e.asignados.join(" / ") || "—")}</b></div>
     </div>
     ${s.fotoId ? `<p class="h-sec">Foto del último movimiento</p><img class="det-foto" id="det-foto" alt="Foto del equipo">` : ""}
-    <p class="h-sec">Movimientos recientes</p>
-    <div class="lista-mov">${hist.map(htmlMov).join("") || `<p class="vacio-msg">Sin movimientos recientes cargados</p>`}</div>`);
+    <p class="h-sec">Movimientos de hoy</p>
+    <div class="lista-mov">${hist.map(htmlMov).join("") || `<p class="vacio-msg">Sin movimientos hoy</p>`}</div>`);
   if (s.fotoId) cargarFoto(s.fotoId, $("#det-foto"));
 }
 async function cargarFoto(id, img) {
   try { const d = await backend.getFoto(id); if (d && img) img.src = d; else if (img) img.alt = "Foto no disponible"; } catch { }
 }
 
-// ------------------------------------------------------------------ historial
+// ------------------------------------------------------------------ historial (solo HOY)
+const inicioDia = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
+let diaSub = 0;
 function suscribirMovs() {
-  if (offMovs) return;
-  offMovs = backend.onMovimientos(movLimite, (lista) => {
+  const hoy = inicioDia();
+  if (offMovs && diaSub === hoy) return;
+  if (offMovs) offMovs();
+  diaSub = hoy;
+  offMovs = backend.onMovimientosDesde(hoy, (lista) => {
     movs = lista;
     if (vistaActual === "v-hist") renderHist();
   });
@@ -405,14 +410,9 @@ function htmlMov(m) {
 function renderHist() {
   const q = norm($("#his-buscar").value);
   const lista = movs.filter((m) => !q || norm([m.usuario, ...(m.codigos || []), m.tipo, m.nota].join(" ")).includes(q));
-  $("#his-lista").innerHTML = lista.map(htmlMov).join("") || `<p class="vacio-msg">${movs.length ? "Sin coincidencias" : "Aún no hay movimientos"}</p>`;
-  $("#his-mas").hidden = movs.length < movLimite;
+  $("#his-lista").innerHTML = lista.map(htmlMov).join("") || `<p class="vacio-msg">${movs.length ? "Sin coincidencias" : "Aún no hay movimientos hoy"}</p>`;
 }
 $("#his-buscar").oninput = renderHist;
-$("#his-mas").onclick = () => {
-  movLimite += AJUSTES.historialPorPagina;
-  if (offMovs) offMovs(); offMovs = null; suscribirMovs();
-};
 document.addEventListener("click", (e) => {
   const b = e.target.closest(".mov"); if (!b) return;
   const m = movs.find((x) => x.id === b.dataset.m); if (!m) return;
@@ -426,27 +426,6 @@ document.addEventListener("click", (e) => {
     ${m.fotoId ? `<img class="det-foto" id="mov-foto-det" alt="Cargando foto…">` : `<p class="vacio-msg">Sin foto</p>`}`);
   if (m.fotoId) cargarFoto(m.fotoId, $("#mov-foto-det"));
 });
-
-$("#his-csv").onclick = () => {
-  toast("Preparando archivo…");
-  let off = null;
-  off = backend.onMovimientos(5000, (lista) => {
-    setTimeout(() => off && off());
-    const filas = [["Fecha", "Hora", "Movimiento", "Persona", "PDA", "Radio", "Observación", "Avisos"]];
-    lista.forEach((m) => {
-      const d = new Date(m.ts);
-      const pda = (m.equipos || []).filter((i) => i.tipo === "PDA").map((i) => i.codigo).join(" ");
-      const rad = (m.equipos || []).filter((i) => i.tipo === "RADIO").map((i) => i.codigo).join(" ");
-      filas.push([d.toLocaleDateString("es-PE"), d.toLocaleTimeString("es-PE", { hour12: false }), m.tipo === "retiro" ? "Retiro" : "Devolución", m.usuario, pda, rad, m.nota || "", (m.avisos || []).join("; ")]);
-    });
-    const csv = "﻿" + filas.map((f) => f.map((x) => `"${String(x ?? "").replace(/"/g, '""')}"`).join(";")).join("\r\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-    a.download = `movimientos_equipos_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  });
-};
 
 // ------------------------------------------------------------------ enlace directo desde QR del equipo (?eq=2853)
 function procesarDeepLink() {
@@ -472,7 +451,6 @@ async function iniciar() {
     $("#cargando").innerHTML = `<p style="padding:20px;text-align:center">No se pudo conectar con el servidor.<br><small>${esc(e.message || e)}</small><br><br><button class="btn btn-pri" onclick="location.reload()">Reintentar</button></p>`;
     return;
   }
-  $("#banner-demo").hidden = backend.modo !== "demo";
   backend.onEquipos((m) => {
     estados = m;
     const primera = !listo;
@@ -488,6 +466,7 @@ async function iniciar() {
     if (vistaActual === "v-mov") renderMov(); // refresca alertas sin perder la selección
   });
   setInterval(() => {
+    if (offMovs && diaSub !== inicioDia()) suscribirMovs(); // cambio de día
     if (vistaActual === "v-inicio") renderInicio();
     if (vistaActual === "v-panel") renderPanel();
   }, 60000);

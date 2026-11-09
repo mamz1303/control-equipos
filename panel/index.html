@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Panel de Control · Equipos</title>
+  <meta name="theme-color" content="#0A2F6B">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../icons/icon-192.png">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="sin-tab">
+  <header class="top">
+    <img src="../img/logo-cerroverde.png" alt="Cerro Verde" class="logo-cv">
+    <img src="../img/logo-freeport.svg" alt="Freeport-McMoRan" class="logo-fx">
+  </header>
+
+  <main>
+    <!-- ============ CÓDIGO ============ -->
+    <section id="v-lock" class="vista" hidden>
+      <div class="lock">
+        <div class="lock-ico"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2h1V6a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v3h6V6a3 3 0 0 0-3-3Zm0 10a2 2 0 0 0-1 3.7V19h2v-2.3A2 2 0 0 0 12 13Z"/></svg></div>
+        <h1 class="h-lg">Panel de control</h1>
+        <p class="sub">Ingresa el código de seguridad</p>
+        <input id="lock-cod" class="input lock-in" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="••••••••">
+        <button id="lock-ok" class="btn btn-azul">Entrar</button>
+        <p id="lock-err" class="lock-err" hidden>Código incorrecto</p>
+        <a class="link" href="../">← Volver a la app</a>
+      </div>
+    </section>
+
+    <!-- ============ PANEL ============ -->
+    <section id="v-adm" class="vista" hidden>
+      <div class="fila-tit">
+        <h1 class="h-lg">Registros</h1>
+        <button id="adm-salir" class="btn-mini">Salir</button>
+      </div>
+
+      <div class="card">
+        <div class="seg" id="adm-modo">
+          <button data-m="dia" class="on">Día</button><button data-m="mes">Mes</button><button data-m="rango">Rango</button>
+        </div>
+        <div id="f-dia"><label class="lbl">Fecha</label><input id="in-dia" type="date" class="input"></div>
+        <div id="f-mes" hidden><label class="lbl">Mes</label><input id="in-mes" type="month" class="input"></div>
+        <div id="f-rango" hidden class="dos">
+          <div><label class="lbl">Desde</label><input id="in-desde" type="date" class="input"></div>
+          <div><label class="lbl">Hasta</label><input id="in-hasta" type="date" class="input"></div>
+        </div>
+        <button id="adm-buscar" class="btn btn-azul">Consultar</button>
+      </div>
+
+      <div id="adm-res" hidden>
+        <div class="stats" id="adm-stats"></div>
+        <div class="fila-tit">
+          <div class="chips" id="adm-vista"><button data-v="lista" class="chip on">Lista</button><button data-v="fotos" class="chip">Fotos</button></div>
+          <button id="adm-csv" class="btn-mini naranja">⬇ Exportar CSV</button>
+        </div>
+        <input id="adm-filtro" class="input" type="search" placeholder="Filtrar por nombre o código" autocomplete="off">
+        <div id="adm-lista"></div>
+      </div>
+
+      <div id="adm-pruebas" class="card zona-pruebas" hidden>
+        <h3>Modo pruebas</h3>
+        <p>Borra todos los movimientos, fotos y el estado de los equipos (todos quedan <b>disponibles</b>). Los nombres registrados en los celulares se mantienen.</p>
+        <button id="adm-borrar" class="btn btn-rojo">Borrar datos</button>
+      </div>
+      <a class="link" href="../" style="display:block;text-align:center;margin-top:18px">← Volver a la app</a>
+    </section>
+  </main>
+
+  <div id="hoja" class="hoja" hidden><div class="hoja-in"><button class="hoja-x" aria-label="Cerrar">✕</button><div id="hoja-cont"></div></div></div>
+  <div id="dialogo" class="dialogo" hidden><div class="dlg-in"><div id="dlg-txt"></div><div class="dlg-bot"><button class="btn btn-sec" id="dlg-no">Cancelar</button><button class="btn btn-pri" id="dlg-si">Sí</button></div></div></div>
+  <div id="toast" class="toast" hidden></div>
+  <div id="cargando" class="cargando" hidden><div class="spin"></div><p id="cargando-txt">Cargando…</p></div>
+
+  <script type="module" src="../js/admin.js"></script>
+</body>
+</html>
