@@ -16,58 +16,105 @@
     <img src="../img/logo-freeport.svg" alt="Freeport-McMoRan" class="logo-fx">
   </header>
 
-  <main>
-    <!-- ============ CÓDIGO ============ -->
-    <section id="v-lock" class="vista" hidden>
-      <div class="lock">
-        <div class="lock-ico"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2h1V6a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v3h6V6a3 3 0 0 0-3-3Zm0 10a2 2 0 0 0-1 3.7V19h2v-2.3A2 2 0 0 0 12 13Z"/></svg></div>
-        <h1 class="h-lg">Panel de control</h1>
-        <p class="sub">Ingresa el código de seguridad</p>
-        <input id="lock-cod" class="input lock-in" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="••••••••">
-        <button id="lock-ok" class="btn btn-azul">Entrar</button>
-        <p id="lock-err" class="lock-err" hidden>Código incorrecto</p>
-        <a class="link" href="../">← Volver a la app</a>
-      </div>
-    </section>
-
-    <!-- ============ PANEL ============ -->
-    <section id="v-adm" class="vista" hidden>
-      <div class="fila-tit">
-        <h1 class="h-lg">Registros</h1>
-        <button id="adm-salir" class="btn-mini">Salir</button>
-      </div>
-
-      <div class="card">
-        <div class="seg" id="adm-modo">
-          <button data-m="dia" class="on">Día</button><button data-m="mes">Mes</button><button data-m="rango">Rango</button>
-        </div>
-        <div id="f-dia"><label class="lbl">Fecha</label><input id="in-dia" type="date" class="input"></div>
-        <div id="f-mes" hidden><label class="lbl">Mes</label><input id="in-mes" type="month" class="input"></div>
-        <div id="f-rango" hidden class="dos">
-          <div><label class="lbl">Desde</label><input id="in-desde" type="date" class="input"></div>
-          <div><label class="lbl">Hasta</label><input id="in-hasta" type="date" class="input"></div>
-        </div>
-        <button id="adm-buscar" class="btn btn-azul">Consultar</button>
-      </div>
-
-      <div id="adm-res" hidden>
-        <div class="stats" id="adm-stats"></div>
-        <div class="fila-tit">
-          <div class="chips" id="adm-vista"><button data-v="lista" class="chip on">Lista</button><button data-v="fotos" class="chip">Fotos</button></div>
-          <button id="adm-csv" class="btn-mini naranja">⬇ Exportar CSV</button>
-        </div>
-        <input id="adm-filtro" class="input" type="search" placeholder="Filtrar por nombre o código" autocomplete="off">
-        <div id="adm-lista"></div>
-      </div>
-
-      <div id="adm-pruebas" class="card zona-pruebas" hidden>
-        <h3>Modo pruebas</h3>
-        <p>Borra todos los movimientos, fotos y el estado de los equipos (todos quedan <b>disponibles</b>). Los nombres registrados en los celulares se mantienen.</p>
-        <button id="adm-borrar" class="btn btn-rojo">Borrar datos</button>
-      </div>
-      <a class="link" href="../" style="display:block;text-align:center;margin-top:18px">← Volver a la app</a>
-    </section>
+  <!-- ============ CÓDIGO ============ -->
+  <main id="v-lock" hidden>
+    <div class="lock">
+      <div class="lock-ico"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2h1V6a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v3h6V6a3 3 0 0 0-3-3Zm0 10a2 2 0 0 0-1 3.7V19h2v-2.3A2 2 0 0 0 12 13Z"/></svg></div>
+      <h1 class="h-lg">Panel de control</h1>
+      <p class="sub">Ingresa el código de seguridad</p>
+      <input id="lock-cod" class="input lock-in" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="••••••••">
+      <button id="lock-ok" class="btn btn-azul">Entrar</button>
+      <p id="lock-err" class="lock-err" hidden>Código incorrecto</p>
+      <a class="link" href="../">← Volver a la app</a>
+    </div>
   </main>
+
+  <!-- ============ PANEL ============ -->
+  <div id="v-adm" hidden>
+    <nav class="adm-tabs" id="adm-tabs">
+      <button data-p="p-res" class="on">Resumen</button><button data-p="p-reg">Registros</button><button data-p="p-eq">Equipos</button><button data-p="p-per">Personal</button><button data-p="p-qr">QR</button>
+    </nav>
+    <main>
+      <!-- ---------- REGISTROS ---------- -->
+      <section id="p-res" class="pest">
+        <div class="fila-tit"><h1 class="h-lg">Resumen</h1><button class="btn-mini" data-salir>Salir</button></div>
+        <p class="lbl">Ahora mismo</p>
+        <div class="stats stats4" id="res-ahora"></div>
+        <div id="res-vencidos"></div>
+        <div id="res-revision"></div>
+        <p class="lbl" style="margin-top:20px">Uso del periodo</p>
+        <div class="seg seg4" id="res-periodo"><button data-d="hoy" class="on">Hoy</button><button data-d="7">7 días</button><button data-d="30">30 días</button><button data-d="mes">Este mes</button></div>
+        <div id="res-cont"></div>
+        <div class="card" id="res-turnos" style="margin-top:18px">
+          <h3 class="h-card">Horarios de cierre de turno</h3>
+          <p class="ayuda" style="margin:0 0 10px">Un equipo figura como <b>no devuelto</b> si sigue fuera después del cierre del turno en que se retiró (+ tolerancia).</p>
+          <div id="tur-lista"></div>
+          <button class="btn-mini" id="tur-add" style="margin:6px 0 12px">+ Agregar cierre</button>
+          <div class="campo"><label class="lbl">Tolerancia (minutos)</label><input id="tur-tol" class="input" type="number" min="0" max="240" inputmode="numeric"></div>
+          <button class="btn btn-azul" id="tur-guardar">Guardar horarios</button>
+        </div>
+      </section>
+
+      <section id="p-reg" class="pest" hidden>
+        <div class="fila-tit"><h1 class="h-lg">Registros</h1><button class="btn-mini" data-salir>Salir</button></div>
+        <div class="card">
+          <div class="seg" id="adm-modo"><button data-m="dia" class="on">Día</button><button data-m="mes">Mes</button><button data-m="rango">Rango</button></div>
+          <div id="f-dia"><label class="lbl">Fecha</label><input id="in-dia" type="date" class="input"></div>
+          <div id="f-mes" hidden><label class="lbl">Mes</label><input id="in-mes" type="month" class="input"></div>
+          <div id="f-rango" hidden class="dos">
+            <div><label class="lbl">Desde</label><input id="in-desde" type="date" class="input"></div>
+            <div><label class="lbl">Hasta</label><input id="in-hasta" type="date" class="input"></div>
+          </div>
+          <button id="adm-buscar" class="btn btn-azul">Consultar</button>
+        </div>
+        <div id="adm-res" hidden>
+          <div class="stats" id="adm-stats"></div>
+          <div class="fila-tit">
+            <div class="chips" id="adm-vista"><button data-v="lista" class="chip on">Lista</button><button data-v="fotos" class="chip">Fotos</button></div>
+            <button id="adm-csv" class="btn-mini naranja">⬇ Exportar CSV</button>
+          </div>
+          <input id="adm-filtro" class="input" type="search" placeholder="Filtrar por nombre o código" autocomplete="off">
+          <div id="adm-lista"></div>
+        </div>
+        <div id="adm-pruebas" class="card zona-pruebas" hidden>
+          <h3>Modo pruebas</h3>
+          <p>Borra todos los movimientos y fotos; todos los equipos quedan <b>disponibles</b>. El catálogo de equipos y el personal NO se borran.</p>
+          <button id="adm-borrar" class="btn btn-rojo">Borrar datos</button>
+        </div>
+      </section>
+
+      <!-- ---------- EQUIPOS ---------- -->
+      <section id="p-eq" class="pest" hidden>
+        <div class="fila-tit"><h1 class="h-lg">Equipos</h1><button class="btn-mini" id="eq-tipos">⚙ Tipos de equipo</button></div>
+        <button class="btn btn-pri" id="eq-nuevo">+ Agregar equipo</button>
+        <input id="eq-buscar" class="input" type="search" placeholder="Buscar código, tipo o asignado" autocomplete="off" style="margin-top:12px">
+        <div class="chips" id="eq-chips"></div>
+        <div id="eq-lista" class="lista-eq"></div>
+      </section>
+
+      <!-- ---------- PERSONAL ---------- -->
+      <section id="p-per" class="pest" hidden>
+        <div class="fila-tit"><h1 class="h-lg">Personal</h1></div>
+        <button class="btn btn-pri" id="per-nuevo">+ Agregar persona</button>
+        <input id="per-buscar" class="input" type="search" placeholder="Buscar nombre" autocomplete="off" style="margin-top:12px">
+        <div class="chips" id="per-chips"><button data-v="activos" class="chip on">Activos</button><button data-v="inactivos" class="chip">Reemplazados / de baja</button></div>
+        <div id="per-lista" class="lista-eq"></div>
+      </section>
+
+      <!-- ---------- QR ---------- -->
+      <section id="p-qr" class="pest" hidden>
+        <div class="fila-tit"><h1 class="h-lg">Etiquetas QR</h1></div>
+        <div class="card">
+          <label class="check-fila"><input type="checkbox" id="qr-cartel" checked> Incluir cartel de acceso a la app (1.ª página)</label>
+          <p class="lbl" style="margin:12px 0 6px">Selección rápida</p>
+          <div class="chips" id="qr-rapido"></div>
+          <input id="qr-buscar" class="input" type="search" placeholder="Buscar código o asignado" autocomplete="off">
+          <div id="qr-lista" class="qr-lista"></div>
+        </div>
+        <div class="pie-fijo"><button id="qr-generar" class="btn btn-pri">Generar PDF</button></div>
+      </section>
+    </main>
+  </div>
 
   <div id="hoja" class="hoja" hidden><div class="hoja-in"><button class="hoja-x" aria-label="Cerrar">✕</button><div id="hoja-cont"></div></div></div>
   <div id="dialogo" class="dialogo" hidden><div class="dlg-in"><div id="dlg-txt"></div><div class="dlg-bot"><button class="btn btn-sec" id="dlg-no">Cancelar</button><button class="btn btn-pri" id="dlg-si">Sí</button></div></div></div>

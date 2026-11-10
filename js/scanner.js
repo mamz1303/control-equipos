@@ -88,14 +88,13 @@ export function escanearQR({ titulo = "Escanea el QR del equipo" } = {}) {
   });
 }
 
-// Extrae el código de equipo de lo leído: acepta URL con ?eq=2853, "CV-PDA-2853" o "2853"
+// Posibles códigos a partir de lo leído: URL con ?eq=..., "CV-PDA-2853", "2853" o texto libre
 export function codigoDesdeQR(texto) {
-  if (!texto) return null;
-  try {
-    const u = new URL(texto);
-    const eq = u.searchParams.get("eq");
-    if (eq) return eq.trim();
-  } catch {}
-  const m = String(texto).match(/(\d{4})(?!.*\d)/);
-  return m ? m[1] : null;
+  if (!texto) return [];
+  const t = String(texto).trim(), c = [];
+  try { const eq = new URL(t).searchParams.get("eq"); if (eq) c.push(eq.trim()); } catch {}
+  c.push(t);
+  const seg = t.split(/[-|/:\s]/).filter(Boolean).pop(); if (seg) c.push(seg);
+  const m = t.match(/(\d{3,})(?!.*\d)/); if (m) c.push(m[1]);
+  return [...new Set(c)];
 }

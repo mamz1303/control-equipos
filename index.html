@@ -56,6 +56,7 @@
       <p class="paso"><b>1</b> ¿Qué equipo?</p>
       <div class="tiles" id="mov-tiles"></div>
       <div id="mov-codigos"></div>
+      <div id="mov-dano-zona" hidden></div>
 
       <p class="paso"><b>2</b> <span id="mov-foto-lbl">Foto del equipo</span></p>
       <label class="foto-btn" id="mov-foto-box">
@@ -81,14 +82,12 @@
 
     <!-- ============ PANEL ============ -->
     <section id="v-panel" class="vista" hidden>
-      <h1 class="h-lg">Panel de equipos</h1>
+      <div class="fila-tit"><h1 class="h-lg">Panel de equipos</h1><a href="panel/" class="btn-mini btn-control"><svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 1a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2h1V6a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v3h6V6a3 3 0 0 0-3-3Z"/></svg>Control</a></div>
       <div class="contadores" id="pan-cont"></div>
       <input id="pan-buscar" class="input" type="search" placeholder="Buscar código o nombre (ej. Juan Berrio)" autocomplete="off">
-      <div class="chips" id="pan-chips-tipo">
-        <button data-v="" class="chip on">Todos</button><button data-v="PDA" class="chip">PDA</button><button data-v="RADIO" class="chip">Radios</button>
-      </div>
+      <div class="chips" id="pan-chips-tipo"></div>
       <div class="chips" id="pan-chips-est">
-        <button data-v="" class="chip on">Todos</button><button data-v="disponible" class="chip">Disponibles</button><button data-v="en_uso" class="chip">En uso</button>
+        <button data-v="" class="chip on">Todos</button><button data-v="disponible" class="chip">Disponibles</button><button data-v="en_uso" class="chip">En uso</button><button data-v="mios" class="chip chip-mio">👤 Mis equipos</button>
       </div>
       <div id="pan-lista" class="lista-eq"></div>
     </section>

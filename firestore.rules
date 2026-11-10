@@ -9,19 +9,38 @@ service cloud.firestore {
     function pruebas() {
       return get(/databases/$(database)/documents/config/app).data.modoPruebas == true;
     }
+    function estadoValido() {
+      return !('estado' in request.resource.data) || request.resource.data.estado in ['en_uso', 'disponible', 'revision'];
+    }
 
+    // Ajustes editables desde /panel (horarios de cierre de turno)
+    match /ajustes/{id} {
+      allow read, write: if app();
+    }
     match /config/{id} {
       allow read: if app();
       allow write: if false;            // solo se edita desde la consola de Firebase
     }
-    match /equipos/{codigo} {
+    // Catálogo: tipos de equipo y personal (se gestionan desde /panel; no se borran, se dan de baja)
+    match /tipos/{id} {
       allow read: if app();
-      allow create, update: if app() && request.resource.data.estado in ['en_uso', 'disponible'];
-      allow delete: if app() && pruebas();
+      allow create, update: if app() && request.resource.data.nombre is string;
+      allow delete: if false;
+    }
+    match /personal/{id} {
+      allow read: if app();
+      allow create, update: if app() && request.resource.data.nombre is string;
+      allow delete: if false;
+    }
+    // Equipos: catálogo + estado actual (en uso / disponible)
+    match /equipos/{id} {
+      allow read: if app();
+      allow create, update: if app() && estadoValido();
+      allow delete: if false;
     }
     match /movimientos/{id} {
       allow read: if app();
-      allow create: if app() && request.resource.data.tipo in ['retiro', 'devolucion'];
+      allow create: if app() && request.resource.data.tipo in ['retiro', 'devolucion', 'revision', 'liberacion'];
       allow update: if false;           // el historial no se puede alterar
       allow delete: if app() && pruebas();
     }

@@ -46,7 +46,7 @@ Si usas otro nombre de repositorio, las etiquetas QR deben regenerarse con la nu
 - **Primera vez:** cada persona elige su nombre (queda guardado en ese celular). “No soy yo” para cambiar.
 - **Retirar:** toca PDA, Radio o ambos → se propone su equipo asignado si está libre (o escanea el QR) → foto → Registrar.
 - **Devolver:** si la persona tiene equipos, el inicio muestra **Devolver equipo** con todo autocompletado; solo falta la foto.
-- **Panel:** estado en vivo de los 34 equipos, buscar por código o nombre (asignado o quien lo tiene), filtros PDA/Radio y Disponible/En uso. Rojo = más de 14 h fuera (`alertaHorasEnUso`).
+- **Panel:** estado en vivo de los equipos, buscar por código o nombre, filtros por tipo, Disponible/En uso y **Mis equipos** (asignados a ti o en tu poder). Rojo = más de 14 h fuera (`alertaHorasEnUso`).
 - **Historial (público):** solo los movimientos de HOY, en vivo, con foto.
 - **/panel (con código):** `https://mamz1303.github.io/control-equipos/panel/` → consulta por Día, Mes o Rango,
   vista Lista o Fotos, descarga de fotos y **Exportar CSV** del periodo. La sesión dura 8 h en ese celular.
@@ -63,8 +63,23 @@ Si usas otro nombre de repositorio, las etiquetas QR deben regenerarse con la nu
 Firestore da 1 GB. Con 2 fotos por persona y turno (~26 personas) se usan ~5 MB/día → ~6 meses.
 Cuando se acerque al límite, borra la colección `fotos` antigua desde la consola (los movimientos se conservan).
 
-## Cambios frecuentes (en `js/config.js`)
-- Agregar/quitar personal → lista `PERSONAL`.
-- Agregar equipo o cambiar asignado → lista `EQUIPOS` (el código es lo que importa).
+## Panel de control (/panel)
+Se entra desde **Panel → 🔒 Control** en la app, con cualquiera de los códigos autorizados (sesión de 8 h).
+- **Registros:** consulta por día/mes/rango, lista o fotos, exportar CSV, borrar datos (solo en modo pruebas).
+- **Equipos:** agregar, editar código/tipo/asignados, dar de baja. **⚙ Tipos de equipo** para crear tipos nuevos (Tablet, Linterna…) con su ícono, u ocultarlos.
+- **Personal:** agregar, corregir nombre, asignar equipos, **reemplazar** (sus equipos pasan al nuevo; el historial queda con el nombre anterior) y dar de baja/reactivar.
+- **QR:** genera el PDF de etiquetas para todos, por tipo o los que marques. Los equipos nuevos o con código cambiado quedan marcados solos.
+
+La primera vez que se edita algo, el catálogo inicial (Excel, en `js/config.js`) se copia a Firebase. Desde ahí, todo se administra en el panel y `config.js` ya no se usa para equipos ni personal.
+
+Para agregar otro código de acceso: calcula su SHA-256 y súmalo a la lista `HASHES` en `js/admin.js`.
+
+## Turnos, equipos no devueltos y daños
+- **Horarios de cierre de turno:** en /panel → Resumen (por defecto 07:00 y 19:00, tolerancia 30 min). Un equipo es **no devuelto** si sigue fuera después del cierre del turno en que se retiró + tolerancia. Se ve en rojo en la app (inicio de la persona y Panel → "No devueltos") y en el Resumen, con exportación a CSV.
+- **Reporte de daño:** al devolver, "Reportar daño o falla" + descripción. El equipo queda **En revisión** y no se puede retirar (ni por lista, ni por QR). Se libera en /panel → Equipos (o desde el Resumen) con "Liberar: reparado"; el administrador también puede enviar un equipo a revisión. Todo queda en el historial.
+- **Resumen:** estado actual (disponibles, en uso, no devueltos, en revisión) y, por periodo (hoy, 7 días, 30 días, mes): retiros, devoluciones, devueltos tarde, daños, uso por tipo, equipos que más salen, personas con más horas de uso y quién no devuelve a tiempo.
+
+## Ajustes (en `js/config.js`)
 - Foto opcional → `fotoObligatoriaRetiro: false`.
-- Después de subir cambios, sube la versión en `sw.js` (`equipos-v2`, …) para que los celulares se actualicen.
+- `alertaHorasEnUso` solo se usa si se borran todos los horarios de cierre de turno.
+- Después de subir cambios de código, sube la versión en `sw.js` (`equipos-v4`, …) para que los celulares se actualicen.

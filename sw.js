@@ -1,10 +1,11 @@
 // Service worker: permite instalar la app y abrirla sin señal.
 // Cambia la versión cuando subas cambios para forzar la actualización.
-const VERSION = "equipos-v2";
+const VERSION = "equipos-v4";
 const BASE = [
   "./", "index.html", "css/styles.css", "js/app.js", "js/config.js", "js/backend.js",
   "js/scanner.js", "js/imagen.js", "manifest.webmanifest",
   "panel/", "panel/index.html", "js/admin.js", "css/admin.css",
+  "js/catalogo.js", "js/iconos.js", "js/turnos.js", "js/vendor/qrcode.js",
   "img/logo-cerroverde.png", "img/logo-freeport.svg", "icons/icon-192.png", "icons/icon-512.png"
 ];
 
